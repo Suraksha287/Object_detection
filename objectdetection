@@ -1,0 +1,33 @@
+from ultralytics import YOLO
+import cv2
+
+# Load YOLO model (pre-trained YOLOv8n model is downloaded automatically)
+model = YOLO('yolov8n.pt')  # 'yolov8n.pt' is a lightweight pre-trained model
+
+# Initialize webcam
+cap = cv2.VideoCapture(0)  # 0 is for the default webcam
+
+print("Starting live object detection. Press 'q' to exit.")
+
+while True:
+    ret, frame = cap.read()  # Capture frame-by-frame
+    if not ret:
+        print("Failed to capture frame. Exiting...")
+        break
+
+    # Perform object detection
+    results = model(frame)
+
+    # Annotate the frame with detection results
+    annotated_frame = results[0].plot()  # Plots bounding boxes and labels
+
+    # Display the annotated frame
+    cv2.imshow("Live Object Detection", annotated_frame)
+
+    # Exit on pressing 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Release resources
+cap.release()
+cv2.destroyAllWindows()

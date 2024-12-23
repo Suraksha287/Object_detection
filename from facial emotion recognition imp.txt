@@ -1,0 +1,53 @@
+import requests
+import urllib.request
+import cv2
+import numpy as np
+import imutils
+
+# Initialize EmotionRecognition model (replace this with actual model initialization)
+# Assuming 'er' is the object of the emotion recognition model
+# er = EmotionRecognition(device='cpu')
+
+# URL of the image stream (replace with your actual camera URL)
+url = 'http://192.168.241.226:8080/shot.jpg'
+
+# Function to fetch image from the URL
+def fetch_image(url):
+    try:
+        # Using requests to get the image
+        response = requests.get(url, timeout=10)  # 10 seconds timeout
+        response.raise_for_status()  # Raise an exception for HTTP errors (4xx or 5xx)
+        imgNp = np.array(bytearray(response.content), dtype=np.uint8)
+        frame = cv2.imdecode(imgNp, -1)
+        return frame
+    except requests.exceptions.RequestException as e:
+        # Handle errors such as connection problems, timeouts, etc.
+        print(f"Error while fetching image: {e}")
+        return None
+
+# Video capture loop (in your case, it's for a live video stream from a camera)
+while True:
+    # Fetch the image from the URL
+    frame = fetch_image(url)
+
+    # If the image is successfully fetched, process it
+    if frame is not None:
+        # Assuming 'er.recognise_emotion()' is the method to detect emotions in the image
+        # Replace this with actual emotion recognition if available
+        # frame = er.recognise_emotion(frame, return_type='BGR')
+
+        # Resize the frame for better viewing
+        frame = imutils.resize(frame, width=450)
+
+        # Display the frame
+        cv2.imshow("Frame", frame)
+        
+        # Break the loop when 'Esc' key is pressed
+        key = cv2.waitKey(1)
+        if key == 27:  # 27 is the ASCII code for the 'Esc' key
+            break
+    else:
+        print("Failed to fetch the image. Retrying...")
+
+# Release resources and close windows
+cv2.destroyAllWindows()
